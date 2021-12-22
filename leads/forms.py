@@ -1,6 +1,7 @@
 from django import forms
 from .models import Lead
 
+
 # Django's form.ModelForm has got more functionality then form.Form itself
 # Therefore, it is advisable to use Django's build-in form.ModelForm
 class LeadModelForm(forms.ModelForm):
@@ -14,7 +15,7 @@ class LeadModelForm(forms.ModelForm):
         )
 
 
-# class LeadForm(forms.Form):
-#     first_name = forms.CharField()
-#     last_name = forms.CharField()
-#     age = forms.IntegerField(min_value=0)
+class LeadForm(forms.Form):
+    first_name = forms.CharField()
+    last_name = forms.CharField()
+    age = forms.IntegerField(min_value=0)

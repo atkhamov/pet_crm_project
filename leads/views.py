@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from .models import Lead, Agent
-from .forms import LeadModelForm
+from .forms import LeadModelForm, LeadForm
 
 
 def lead_list(request):
@@ -21,11 +21,12 @@ def lead_detail(request, pk):
 
 
 def lead_create(request):
-    form = LeadModelForm() #if the request method is not POST, then it should instantiate the empty form
+    form = LeadModelForm()  # if the request method is not POST, then it should instantiate the empty form
     print(request.POST)
     if request.method == "POST":
         print("Receiving a post request")
-        form = LeadModelForm(request.POST) #if the request method IS POST, then it should reassign to form with post data being passed into it
+        form = LeadModelForm(
+            request.POST)  # if the request method IS POST, then it should reassign to form with post data being passed into it
         if form.is_valid():
             # print("The form is valid")
             # print(form.cleaned_data)
@@ -50,3 +51,39 @@ def lead_create(request):
         "form": form
     }
     return render(request, "leads/lead_create.html", context)
+
+
+def lead_update(request, pk):
+    lead = Lead.objects.get(id=pk)
+    form = LeadModelForm(instance=lead)
+    if request.method == "POST":
+        form = LeadModelForm(
+            request.POST, instance=lead)  # if the request method IS POST, then it should reassign to form with post data being passed into it
+        if form.is_valid():
+            form.save()
+            return redirect("/leads")
+    context = {
+        "form": form,
+        "lead": lead
+    }
+    return render(request, "leads/lead_update.html", context)
+
+# def lead_update(request, pk):
+#     lead = Lead.objects.get(id=pk)
+#     form = LeadForm()  # if the request method is not POST, then it should instantiate the empty form
+#     if request.method == "POST":
+#         form = LeadForm(request.POST)  # if the request method IS POST, then it should reassign to form with post data being passed into it
+#         if form.is_valid():
+#             first_name = form.cleaned_data['first_name']
+#             last_name = form.cleaned_data['last_name']
+#             age = form.cleaned_data['age']
+#             lead.first_name = first_name
+#             lead.last_name = last_name
+#             lead.age = age
+#             lead.save()
+#             return redirect("/leads")
+#     context = {
+#         "form": form,
+#         "lead": lead
+#     }
+#     return render(request, "leads/lead_update.html", context)
