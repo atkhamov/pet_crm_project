@@ -8,6 +8,13 @@ class User(AbstractUser):
     # and 'last_name' fields from AbstractUser
 
 
+class UserProfile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.user.username
+
+
 class Lead(models.Model):
     first_name = models.CharField(max_length=20)
     last_name = models.CharField(max_length=20)
@@ -25,6 +32,7 @@ class Agent(models.Model):
     # indicate the OneToOneField relationship, which ensures that
     # the user will become Agent automatically, and credentials
     # will get persisted in Agent model as well
+    organisation = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
 
     def __str__(self):
         return self.user.email
