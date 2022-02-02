@@ -3,7 +3,7 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import UserCreationForm, UsernameField
 from .models import Lead
 
-
+# the following get_user_model() method will return the currently active user model
 User = get_user_model()
 
 # Django's form.ModelForm has got more functionality then form.Form itself

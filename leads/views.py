@@ -128,7 +128,7 @@ class LeadUpdateView(LoginRequiredMixin, generic.UpdateView):
 #     return render(request, "leads/lead_update.html", context)
 
 
-class LeadDeleteView(LoginRequiredMixin, generic.DeleteView):
+class LeadDeleteView(LoginRequiredMixin,  generic.DeleteView):
     template_name = "leads/lead_delete.html"
     queryset = Lead.objects.all()
 
