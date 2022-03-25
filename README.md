@@ -39,5 +39,3 @@ Active Directory is a directory service for managing domains, users and distribu
 Active Directory contains information regarding every user account on an entire network. It treats each user account as an object. Each user object also has multiple attributes. An example of an attribute is the user's first name, last name or e-mail address. All this information exists within a huge, cryptic database on a domain controller -- Active Directory. The challenge is to extract information in a usable format. This is LDAP's main job.
 
 LDAP uses a relatively simple, string-based query to extract information from Active Directory. LDAP can store and extract objects such as usernames and passwords in Active Directory, and share that object data throughout a network. The nice part is that this all happens behind the scenes. A regular end user will never have to manually perform an LDAP query, because Outlook is LDAP-enabled and knows how perform all the necessary queries on its own.
-
-6:25:38
