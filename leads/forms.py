@@ -3,8 +3,8 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import UserCreationForm, UsernameField
 from .models import Lead
 
-
 User = get_user_model()
+
 
 # Django's form.ModelForm has got more functionality then form.Form itself
 # Therefore, it is advisable to use Django's build-in form.ModelForm
@@ -15,6 +15,7 @@ class LeadModelForm(forms.ModelForm):
             'first_name',
             'last_name',
             'age',
+            'organisation',
             'agent',
         )
 

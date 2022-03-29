@@ -34,11 +34,14 @@ class LeadListView(LoginRequiredMixin, generic.ListView):
         # initial queryset of leads for the entire organisation
         if user.is_organisor:
             queryset = Lead.objects.filter(
-                organisation=user.userprofile,
+                organisation=user.is_organisor,
                 agent__isnull=False
             )
         else:
-            queryset = Lead.objects.filter(organisation=user.agent.organisation)
+            queryset = Lead.objects.filter(
+                organisation=user.agent.organisation,
+                agent__isnull=False
+            )
             # filter for the agent that is logged in
             queryset = queryset.filter(agent__user=user)
         return queryset
@@ -48,7 +51,7 @@ class LeadListView(LoginRequiredMixin, generic.ListView):
         user = self.request.user
         if user.is_organisor:
             queryset = Lead.objects.filter(
-                organisation=user.userprofile,
+                organisation=user.is_organisor,
                 agent__isnull=True
             )
             context.update({
@@ -74,7 +77,7 @@ class LeadDetailView(LoginRequiredMixin, generic.DetailView):
         user = self.request.user
         # initial queryset of leads for the entire organisation
         if user.is_organisor:
-            queryset = Lead.objects.filter(organisation=user.userprofile)
+            queryset = Lead.objects.filter(organisation=user.is_organisor)
         else:
             queryset = Lead.objects.filter(organisation=user.agent.organisation)
             # filter for the agent that is logged in
@@ -148,7 +151,7 @@ class LeadUpdateView(OrganisorAndLoginRequiredMixin, generic.UpdateView):
     def get_queryset(self):
         user = self.request.user
         # initial queryset of leads for the entire organisation
-        return Lead.objects.filter(organisation=user.userprofile)
+        return Lead.objects.filter(organisation=user.is_organisor)
 
     def get_success_url(self):
         return reverse("leads:lead-list")
