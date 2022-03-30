@@ -4,7 +4,9 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponse
 from .models import Lead, Agent
 from .forms import LeadModelForm, LeadForm, CustomUserCreationForm
+
 from django.views import generic
+from agents.mixins import OrganisorAndLoginRequiredMixin
 
 
 class SignupView(generic.CreateView):
@@ -25,8 +27,37 @@ class LandingPageView(generic.TemplateView):
 
 class LeadListView(LoginRequiredMixin, generic.ListView):
     template_name = "leads/lead_list.html"
-    queryset = Lead.objects.all()
     context_object_name = "leads"  # this line of code customizes the context variable and changes default 'object_list' to 'leads'
+
+    def get_queryset(self):
+        user = self.request.user
+        # initial queryset of leads for the entire organisation
+        if user.is_organisor:
+            queryset = Lead.objects.filter(
+                organisation=user.is_organisor,
+                agent__isnull=False
+            )
+        else:
+            queryset = Lead.objects.filter(
+                organisation=user.agent.organisation,
+                agent__isnull=False
+            )
+            # filter for the agent that is logged in
+            queryset = queryset.filter(agent__user=user)
+        return queryset
+
+    def get_context_data(self, **kwargs):
+        context = super(LeadListView, self).get_context_data(**kwargs)
+        user = self.request.user
+        if user.is_organisor:
+            queryset = Lead.objects.filter(
+                organisation=user.is_organisor,
+                agent__isnull=True
+            )
+            context.update({
+                "unassigned_leads": queryset
+            })
+        return context
 
 
 # def lead_list(request):
@@ -42,6 +73,17 @@ class LeadDetailView(LoginRequiredMixin, generic.DetailView):
     queryset = Lead.objects.all()
     context_object_name = "lead"  # this line of code customizes the context variable and changes default 'object_list' to 'lead'
 
+    def get_queryset(self):
+        user = self.request.user
+        # initial queryset of leads for the entire organisation
+        if user.is_organisor:
+            queryset = Lead.objects.filter(organisation=user.is_organisor)
+        else:
+            queryset = Lead.objects.filter(organisation=user.agent.organisation)
+            # filter for the agent that is logged in
+            queryset = queryset.filter(agent__user=user)
+        return queryset
+
 
 # def lead_detail(request, pk):
 #     lead = Lead.objects.get(id=pk)
@@ -51,7 +93,7 @@ class LeadDetailView(LoginRequiredMixin, generic.DetailView):
 #     return render(request, "leads/lead_detail.html", context)
 
 
-class LeadCreateView(LoginRequiredMixin, generic.CreateView):
+class LeadCreateView(OrganisorAndLoginRequiredMixin, generic.CreateView):
     template_name = "leads/lead_create.html"
     form_class = LeadModelForm
 
@@ -102,10 +144,14 @@ class LeadCreateView(LoginRequiredMixin, generic.CreateView):
 #     return render(request, "leads/lead_create.html", context)
 
 
-class LeadUpdateView(LoginRequiredMixin, generic.UpdateView):
+class LeadUpdateView(OrganisorAndLoginRequiredMixin, generic.UpdateView):
     template_name = "leads/lead_update.html"
-    queryset = Lead.objects.all()
     form_class = LeadModelForm
+
+    def get_queryset(self):
+        user = self.request.user
+        # initial queryset of leads for the entire organisation
+        return Lead.objects.filter(organisation=user.is_organisor)
 
     def get_success_url(self):
         return reverse("leads:lead-list")
